@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { DataService } from '../../../src/lib/dataService';
 
-// Stockage temporaire en mémoire (pour les tests)
-let cards: any[] = [];
+const dataService = DataService.getInstance();
 
 export async function POST(request: NextRequest) {
 	try {
@@ -15,27 +15,22 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Créer la carte
-		const newCard = {
-			id: `card_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-			owner_profile: 'demo_user', // Pour les tests
+		// Créer la carte via le service unifié
+		const newCard = await dataService.createCard({
 			card_type: body.card_type,
 			title: body.title,
 			meta: body.meta,
 			channel: body.channel || 'general',
 			published: body.published || false,
-			created_at: new Date().toISOString(),
-		};
+		});
 
-		// Ajouter à la liste
-		cards.push(newCard);
-
-		console.log('Card created:', newCard);
-		console.log('Total cards:', cards.length);
+		console.log('Card created via DataService:', newCard);
+		console.log('Storage type:', dataService.getStorageType());
 
 		return NextResponse.json({
 			success: true,
 			card: newCard,
+			storage_type: dataService.getStorageType(),
 		});
 	} catch (error) {
 		console.error('Error creating card:', error);
@@ -51,26 +46,25 @@ export async function GET(request: NextRequest) {
 		const { searchParams } = new URL(request.url);
 		const channel = searchParams.get('channel');
 		const cardType = searchParams.get('card_type');
+		const limit = searchParams.get('limit');
+		const offset = searchParams.get('offset');
 
-		let filteredCards = cards;
+		// Récupérer les cartes via le service unifié
+		const result = await dataService.getCards({
+			channel: channel || undefined,
+			card_type: cardType || undefined,
+			limit: limit ? parseInt(limit) : undefined,
+			offset: offset ? parseInt(offset) : undefined,
+		});
 
-		// Filtrer par canal
-		if (channel) {
-			filteredCards = filteredCards.filter(card => card.channel === channel);
-		}
-
-		// Filtrer par type de carte
-		if (cardType) {
-			filteredCards = filteredCards.filter(card => card.card_type === cardType);
-		}
-
-		// Trier par date de création (plus récent en premier)
-		filteredCards.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+		console.log('Cards fetched via DataService:', result.cards.length, 'total:', result.total);
+		console.log('Storage type:', dataService.getStorageType());
 
 		return NextResponse.json({
 			success: true,
-			cards: filteredCards,
-			total: filteredCards.length,
+			cards: result.cards,
+			total: result.total,
+			storage_type: dataService.getStorageType(),
 		});
 	} catch (error) {
 		console.error('Error fetching cards:', error);

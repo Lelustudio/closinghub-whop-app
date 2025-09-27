@@ -13,6 +13,9 @@ interface Card {
 export default function EntrepriseHome() {
 	const [cards, setCards] = useState<Card[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [totalCards, setTotalCards] = useState(0);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [storageType, setStorageType] = useState<'memory' | 'supabase'>('memory');
 	const searchParams = useSearchParams();
 	const created = searchParams.get('created');
 
@@ -20,12 +23,16 @@ export default function EntrepriseHome() {
 		fetchCards();
 	}, []);
 
-	const fetchCards = async () => {
+	const fetchCards = async (page = 1, limit = 12) => {
 		try {
-			const response = await fetch('/api/cards?channel=entreprise&card_type=entreprise_offer');
+			const offset = (page - 1) * limit;
+			const response = await fetch(`/api/cards?channel=entreprise&card_type=entreprise_offer&limit=${limit}&offset=${offset}`);
 			const data = await response.json();
 			if (data.success) {
 				setCards(data.cards);
+				setTotalCards(data.total);
+				setCurrentPage(page);
+				setStorageType(data.storage_type || 'memory');
 			}
 		} catch (error) {
 			console.error('Error fetching cards:', error);
@@ -42,11 +49,25 @@ export default function EntrepriseHome() {
 					<div>
 						<h1 className="text-4xl font-extrabold text-white mb-2">Canal Entreprises</h1>
 						<p className="text-white/70">Découvrez les meilleures offres d'emploi pour Closers</p>
-						{created && (
-							<div className="mt-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg">
-								<p className="text-green-400 text-sm">✅ Offre créée avec succès !</p>
+						<div className="flex items-center gap-4 mt-2">
+							{created && (
+								<div className="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+									<p className="text-green-400 text-sm">✅ Offre créée avec succès !</p>
+								</div>
+							)}
+							<div className="px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+								<p className="text-blue-400 text-xs">
+									💾 Stockage: {storageType === 'memory' ? 'Mémoire (dev)' : 'Supabase (prod)'}
+								</p>
 							</div>
-						)}
+							{totalCards > 0 && (
+								<div className="px-3 py-1 bg-gray-500/20 border border-gray-500/30 rounded-lg">
+									<p className="text-gray-400 text-xs">
+										📊 {totalCards} offre{totalCards > 1 ? 's' : ''} au total
+									</p>
+								</div>
+							)}
+						</div>
 					</div>
 					<Link 
 						href="/entreprise/create-offer"
@@ -136,6 +157,43 @@ export default function EntrepriseHome() {
 						<p className="text-white/30 text-sm mt-2">
 							Soyez le premier à publier une offre !
 						</p>
+					</div>
+				)}
+
+				{/* Pagination */}
+				{!loading && totalCards > 12 && (
+					<div className="flex items-center justify-center gap-4 mt-12">
+						<button
+							onClick={() => fetchCards(currentPage - 1)}
+							disabled={currentPage === 1}
+							className="px-4 py-2 rounded-lg bg-white/10 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20 transition-colors"
+						>
+							← Précédent
+						</button>
+						
+						<div className="flex items-center gap-2">
+							{Array.from({ length: Math.ceil(totalCards / 12) }, (_, i) => i + 1).map((page) => (
+								<button
+									key={page}
+									onClick={() => fetchCards(page)}
+									className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+										page === currentPage
+											? 'bg-green-500 text-black font-semibold'
+											: 'bg-white/10 text-white hover:bg-white/20'
+									}`}
+								>
+									{page}
+								</button>
+							))}
+						</div>
+						
+						<button
+							onClick={() => fetchCards(currentPage + 1)}
+							disabled={currentPage >= Math.ceil(totalCards / 12)}
+							className="px-4 py-2 rounded-lg bg-white/10 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/20 transition-colors"
+						>
+							Suivant →
+						</button>
 					</div>
 				)}
 			</div>
