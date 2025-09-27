@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import NavigationArrow from '../../src/components/NavigationArrow';
 
 interface Message {
 	id: string;
@@ -29,8 +30,8 @@ export default function MessagesPage() {
 					id: 'msg_1',
 					from: 'user_123',
 					to: 'current_user',
-					subject: 'Intérêt pour votre profil Closer',
-					body: 'Bonjour, je suis intéressé par votre profil de Closer et souhaiterais discuter d\'une collaboration potentielle...',
+					subject: 'Interest in your Closer profile',
+					body: 'Hello, I am interested in your Closer profile and would like to discuss a potential collaboration...',
 					created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2h ago
 					read: false
 				},
@@ -38,8 +39,8 @@ export default function MessagesPage() {
 					id: 'msg_2',
 					from: 'user_456',
 					to: 'current_user',
-					subject: 'Candidature pour votre offre d\'emploi',
-					body: 'Bonjour, je suis intéressé par votre offre d\'emploi et souhaiterais postuler pour ce poste...',
+					subject: 'Application for your job offer',
+					body: 'Hello, I am interested in your job offer and would like to apply for this position...',
 					created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), // 5h ago
 					read: true
 				}
@@ -59,26 +60,27 @@ export default function MessagesPage() {
 		const diff = now.getTime() - date.getTime();
 		const hours = Math.floor(diff / (1000 * 60 * 60));
 		
-		if (hours < 1) return 'Il y a moins d\'1h';
-		if (hours < 24) return `Il y a ${hours}h`;
+		if (hours < 1) return 'Less than 1h ago';
+		if (hours < 24) return `${hours}h ago`;
 		const days = Math.floor(hours / 24);
-		return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
+		return `${days} day${days > 1 ? 's' : ''} ago`;
 	};
 
 	return (
 		<main className="min-h-screen p-6">
+			<NavigationArrow href="/" />
 			<div className="max-w-4xl mx-auto">
 				{/* Header */}
 				<div className="flex items-center justify-between mb-8">
 					<div>
 						<h1 className="text-4xl font-extrabold text-white mb-2">Messages</h1>
-						<p className="text-white/70">Vos conversations et messages d'intérêt</p>
+						<p className="text-white/70">Your conversations and interest messages</p>
 					</div>
 					<Link 
 						href="/"
 						className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
 					>
-						← Retour à l'accueil
+						← Back to home
 					</Link>
 				</div>
 
@@ -88,20 +90,20 @@ export default function MessagesPage() {
 						href="/closer"
 						className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
 					>
-						Voir les profils Closers
+						View Closer profiles
 					</Link>
 					<Link 
 						href="/entreprise"
 						className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
 					>
-						Voir les offres d'emploi
+						View job offers
 					</Link>
 				</div>
 
 				{/* Loading */}
 				{loading && (
 					<div className="text-center py-12">
-						<p className="text-white/50">Chargement des messages...</p>
+						<p className="text-white/50">Loading messages...</p>
 					</div>
 				)}
 
@@ -128,7 +130,7 @@ export default function MessagesPage() {
 											{message.subject}
 											{!message.read && (
 												<span className="ml-2 px-2 py-1 bg-green-500 text-black text-xs rounded-full">
-													Nouveau
+													New
 												</span>
 											)}
 										</h3>
@@ -151,11 +153,11 @@ export default function MessagesPage() {
 											</span>
 										</div>
 										<span className="text-white/60 text-sm">
-											De: {message.from}
+											From: {message.from}
 										</span>
 									</div>
 									<button className="px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors text-sm">
-										Répondre
+										Reply
 									</button>
 								</div>
 							</div>
@@ -170,10 +172,10 @@ export default function MessagesPage() {
 							<span className="text-4xl">💬</span>
 						</div>
 						<p className="text-white/50 text-lg mb-2">
-							Aucun message pour le moment
+							No messages at the moment
 						</p>
 						<p className="text-white/30 text-sm">
-							Les messages d'intérêt apparaîtront ici quand quelqu'un s'intéressera à vos profils ou offres.
+							Interest messages will appear here when someone is interested in your profiles or offers.
 						</p>
 					</div>
 				)}

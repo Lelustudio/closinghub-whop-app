@@ -76,7 +76,7 @@ export default function FormEntreprise() {
                                         />
                                 </div>
                                 <h2 className="text-3xl font-extrabold">Company offer</h2>
-                                <p className="text-sm italic opacity-80 text-center">What type of collaboration do you have in mind?</p>
+                                       <p className="text-sm italic opacity-80 text-center">What type of collaboration are you looking for?</p>
                         </div>
 
                         <form action={onSubmit} className="mt-7 space-y-6">
@@ -149,7 +149,7 @@ export default function FormEntreprise() {
                                         onMouseDown={(e) => (e.currentTarget.style.transform = "translateY(1px)")}
                                         onMouseUp={(e) => (e.currentTarget.style.transform = "")}
                                 >
-                                        {loading ? 'Publishing…' : 'Publish company offer'}
+                                        {loading ? 'Publishing...' : 'Publish company offer'}
                                 </button>
                         </form>
                 </div>

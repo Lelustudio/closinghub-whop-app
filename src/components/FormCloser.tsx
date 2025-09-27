@@ -76,7 +76,7 @@ export default function FormCloser() {
                                         />
                                 </div>
                                 <h2 className="text-3xl font-extrabold">Closer profile</h2>
-                                <p className="text-sm italic opacity-80 text-center">What type of collaboration do you have in mind?</p>
+                                       <p className="text-sm italic opacity-80 text-center">What type of collaboration are you looking for?</p>
                         </div>
 
                         <form action={onSubmit} className="mt-7 space-y-6">
@@ -153,7 +153,7 @@ export default function FormCloser() {
                                         onMouseDown={(e) => (e.currentTarget.style.transform = "translateY(1px)")}
                                         onMouseUp={(e) => (e.currentTarget.style.transform = "")}
                                 >
-                                        {loading ? 'Publishing…' : 'Publish closer profile'}
+                                        {loading ? 'Publishing...' : 'Publish closer profile'}
                                 </button>
                         </form>
                 </div>
