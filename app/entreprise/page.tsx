@@ -1,7 +1,39 @@
 "use client";
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+interface Card {
+	id: string;
+	title: string;
+	meta: any;
+	created_at: string;
+}
 
 export default function EntrepriseHome() {
+	const [cards, setCards] = useState<Card[]>([]);
+	const [loading, setLoading] = useState(true);
+	const searchParams = useSearchParams();
+	const created = searchParams.get('created');
+
+	useEffect(() => {
+		fetchCards();
+	}, []);
+
+	const fetchCards = async () => {
+		try {
+			const response = await fetch('/api/cards?channel=entreprise&card_type=entreprise_offer');
+			const data = await response.json();
+			if (data.success) {
+				setCards(data.cards);
+			}
+		} catch (error) {
+			console.error('Error fetching cards:', error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	return (
 		<main className="min-h-screen p-6">
 			<div className="max-w-6xl mx-auto">
@@ -10,6 +42,11 @@ export default function EntrepriseHome() {
 					<div>
 						<h1 className="text-4xl font-extrabold text-white mb-2">Canal Entreprises</h1>
 						<p className="text-white/70">Découvrez les meilleures offres d'emploi pour Closers</p>
+						{created && (
+							<div className="mt-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+								<p className="text-green-400 text-sm">✅ Offre créée avec succès !</p>
+							</div>
+						)}
 					</div>
 					<Link 
 						href="/entreprise/create-offer"
@@ -39,55 +76,68 @@ export default function EntrepriseHome() {
 					</Link>
 				</div>
 
-				{/* Content Placeholder */}
-				<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-					{/* Placeholder cards */}
-					{[1, 2, 3, 4, 5, 6].map((i) => (
-						<div 
-							key={i}
-							className="rounded-[25px] text-white p-6 shadow-xl border border-neutral-700"
-							style={{
-								background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 100%)",
-							}}
-						>
-							<div className="flex items-center gap-4 mb-4">
-								<div className="w-12 h-12 rounded-full border-2 border-blue-500 bg-neutral-900 grid place-items-center">
-									<img 
-										src="/images/entreprise-icon.svg" 
-										alt="Entreprise" 
-										className="w-8 h-8 object-contain"
-									/>
-								</div>
-								<div>
-									<h3 className="font-semibold">Company Offer #{i}</h3>
-									<p className="text-sm text-white/60">Expérience requise: Advanced</p>
-								</div>
-							</div>
-							<div className="grid grid-cols-2 gap-2 text-sm mb-4">
-								<div>Weekly calls: 4-8</div>
-								<div>Avg cart: 5k-10k</div>
-								<div>Commission: 15%</div>
-								<div>Prime: Yes</div>
-							</div>
-							<button 
-								className="w-full py-2 rounded-lg bg-gradient-to-r from-lime-400 to-green-600 font-semibold text-black"
-								disabled
-							>
-								Apply now
-							</button>
-						</div>
-					))}
-				</div>
+				{/* Loading */}
+				{loading && (
+					<div className="text-center py-12">
+						<p className="text-white/50">Chargement des offres...</p>
+					</div>
+				)}
 
-				{/* Empty state message */}
-				<div className="text-center mt-12">
-					<p className="text-white/50 text-lg">
-						Les offres d'emploi apparaîtront ici une fois qu'elles auront été publiées.
-					</p>
-					<p className="text-white/30 text-sm mt-2">
-						En attendant, vous pouvez publier votre propre offre !
-					</p>
-				</div>
+				{/* Cards */}
+				{!loading && cards.length > 0 && (
+					<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+						{cards.map((card) => (
+							<div 
+								key={card.id}
+								className="rounded-[25px] text-white p-6 shadow-xl border border-neutral-700"
+								style={{
+									background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,1) 25%, rgba(0,0,0,1) 100%)",
+								}}
+							>
+								<div className="flex items-center gap-4 mb-4">
+									<div className="w-12 h-12 rounded-full border-2 border-blue-500 bg-neutral-900 grid place-items-center">
+										<img 
+											src="/images/entreprise-icon.svg" 
+											alt="Entreprise" 
+											className="w-8 h-8 object-contain"
+										/>
+									</div>
+									<div>
+										<h3 className="font-semibold">{card.meta.company_name}</h3>
+										<p className="text-sm text-white/60">Expérience requise: {card.meta.experience_required}</p>
+									</div>
+								</div>
+								<div className="grid grid-cols-2 gap-2 text-sm mb-4">
+									<div>Weekly calls: {card.meta.weekly_calls}</div>
+									<div>Avg cart: {card.meta.avg_cart}</div>
+									<div>Commission: {card.meta.commission || 'N/A'}</div>
+									<div>Prime: {card.meta.prime ? 'Yes' : 'No'}</div>
+								</div>
+								<div className="mb-4">
+									<p className="text-xs text-white/60 line-clamp-2">{card.meta.description}</p>
+								</div>
+								<button 
+									className="w-full py-2 rounded-lg bg-gradient-to-r from-lime-400 to-green-600 font-semibold text-black"
+									onClick={() => alert('Fonctionnalité Apply now en cours de développement')}
+								>
+									Apply now
+								</button>
+							</div>
+						))}
+					</div>
+				)}
+
+				{/* Empty state */}
+				{!loading && cards.length === 0 && (
+					<div className="text-center mt-12">
+						<p className="text-white/50 text-lg">
+							Aucune offre d'emploi n'a encore été publiée.
+						</p>
+						<p className="text-white/30 text-sm mt-2">
+							Soyez le premier à publier une offre !
+						</p>
+					</div>
+				)}
 			</div>
 		</main>
 	);

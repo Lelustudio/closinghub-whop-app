@@ -27,10 +27,37 @@ export default function FormEntreprise() {
                         return;
                 }
                 
-                // Version simplifiée - affichage des données
-                console.log('Entreprise Offer Data:', parsed.data);
-                alert(`Offre créée avec succès !\n\nEntreprise: ${parsed.data.company_name}\nExpérience requise: ${parsed.data.experience_required}\nDescription: ${parsed.data.description}`);
-                setLoading(false);
+                try {
+                        // Créer la carte via l'API
+                        const response = await fetch('/api/cards', {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                        card_type: 'entreprise_offer',
+                                        title: `${parsed.data.company_name} - ${parsed.data.experience_required} Closer Wanted`,
+                                        meta: parsed.data,
+                                        channel: 'entreprise',
+                                        published: true,
+                                }),
+                        });
+
+                        if (!response.ok) {
+                                throw new Error('Failed to create offer');
+                        }
+
+                        const result = await response.json();
+                        console.log('Offer created successfully:', result);
+                        
+                        // Rediriger vers le canal entreprise
+                        window.location.href = '/entreprise?created=true';
+                        
+                } catch (err) {
+                        console.error('Error creating offer:', err);
+                        setError('Failed to create offer. Please try again.');
+                        setLoading(false);
+                }
         }
 
         return (

@@ -27,10 +27,37 @@ export default function FormCloser() {
                         return;
                 }
                 
-                // Version simplifiée - affichage des données
-                console.log('Closer Profile Data:', parsed.data);
-                alert(`Profile créé avec succès !\n\nNom: ${parsed.data.display_name}\nExpérience: ${parsed.data.experience}\nDisponibilité: ${parsed.data.availability}`);
-                setLoading(false);
+                try {
+                        // Créer la carte via l'API
+                        const response = await fetch('/api/cards', {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                        card_type: 'closer_profile',
+                                        title: `${parsed.data.display_name} - ${parsed.data.experience} Closer`,
+                                        meta: parsed.data,
+                                        channel: 'closer',
+                                        published: true,
+                                }),
+                        });
+
+                        if (!response.ok) {
+                                throw new Error('Failed to create profile');
+                        }
+
+                        const result = await response.json();
+                        console.log('Profile created successfully:', result);
+                        
+                        // Rediriger vers le canal closer
+                        window.location.href = '/closer?created=true';
+                        
+                } catch (err) {
+                        console.error('Error creating profile:', err);
+                        setError('Failed to create profile. Please try again.');
+                        setLoading(false);
+                }
         }
 
         return (
