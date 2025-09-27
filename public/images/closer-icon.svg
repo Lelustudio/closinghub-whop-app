@@ -1,0 +1,26 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fond noir -->
+  <rect width="80" height="80" fill="#000000" rx="40"/>
+  
+  <!-- Forme C extérieure (lavande clair) - plus épaisse -->
+  <path d="M15 15 C15 8, 22 1, 30 1 L50 1 C58 1, 65 8, 65 15 L65 65 C65 72, 58 79, 50 79 L30 79 C22 79, 15 72, 15 65 L15 15 Z" 
+        fill="#B19CD9" 
+        stroke="#B19CD9" 
+        stroke-width="1"/>
+  
+  <!-- Forme C intérieure (violet foncé) - segment épais en bas à droite -->
+  <path d="M25 25 C25 20, 30 15, 35 15 L45 15 C50 15, 55 20, 55 25 L55 35 C55 40, 50 45, 45 45 L35 45 C30 45, 25 40, 25 35 L25 25 Z" 
+        fill="#6B46C1" 
+        stroke="#6B46C1" 
+        stroke-width="1"/>
+  
+  <!-- Segment épais en bas à droite -->
+  <path d="M45 45 C45 42, 47 40, 50 40 L55 40 C58 40, 60 42, 60 45 L60 55 C60 58, 58 60, 55 60 L50 60 C47 60, 45 58, 45 55 L45 45 Z" 
+        fill="#6B46C1"/>
+  
+  <!-- Cercle central (violet foncé) -->
+  <circle cx="40" cy="40" r="6" fill="#6B46C1"/>
+  
+  <!-- Effet de profondeur avec ombre -->
+  <circle cx="40" cy="40" r="6" fill="none" stroke="#4C1D95" stroke-width="1" opacity="0.3"/>
+</svg>
