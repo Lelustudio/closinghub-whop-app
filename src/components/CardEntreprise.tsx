@@ -1,17 +1,50 @@
 "use client";
 import type { Card } from '../types';
+import { useState } from 'react';
 
 export default function CardEntreprise({ card, currentRole, onAfterCta }: { card: Card; currentRole: 'closer' | 'entreprise'; onAfterCta?: () => void }) {
         const meta = (card.meta ?? {}) as any;
         const canApply = currentRole === 'closer';
+        const [isSending, setIsSending] = useState(false);
+        const [messageSent, setMessageSent] = useState(false);
 
         async function onApply() {
-                if (!canApply) return;
-                await fetch('/api/cta/apply', {
-                        method: 'POST',
-                        body: JSON.stringify({ cardId: card.id, fromProfileId: 'me', toProfileId: card.owner_profile }),
-                });
-                onAfterCta?.();
+                if (!canApply || isSending) return;
+                
+                setIsSending(true);
+                try {
+                        // Envoyer un message d'intérêt via Whop
+                        const response = await fetch('/api/messaging/send', {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                        toUserId: card.owner_profile, // ID du propriétaire de la carte
+                                        cardId: card.id,
+                                        cardTitle: card.title,
+                                        cardMeta: card.meta,
+                                        cardType: card.card_type,
+                                        messageType: 'apply_interest'
+                                }),
+                        });
+
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                                setMessageSent(true);
+                                // Afficher une notification de succès
+                                alert('Candidature envoyée avec succès ! L\'entreprise a été notifiée de votre intérêt.');
+                        } else {
+                                alert('Erreur lors de l\'envoi de la candidature: ' + result.error);
+                        }
+                } catch (error) {
+                        console.error('Error sending apply message:', error);
+                        alert('Erreur lors de l\'envoi de la candidature');
+                } finally {
+                        setIsSending(false);
+                        onAfterCta?.();
+                }
         }
 
         return (
@@ -26,10 +59,18 @@ export default function CardEntreprise({ card, currentRole, onAfterCta }: { card
                         </div>
                         <button
                                 onClick={onApply}
-                                disabled={!canApply}
-                                className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-lime-400 to-green-600 font-semibold disabled:opacity-40"
+                                disabled={!canApply || isSending || messageSent}
+                                className={`mt-6 w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
+                                        messageSent 
+                                                ? 'bg-green-600 text-white' 
+                                                : isSending 
+                                                        ? 'bg-yellow-500 text-black' 
+                                                        : canApply 
+                                                                ? 'bg-gradient-to-r from-lime-400 to-green-600 hover:from-lime-300 hover:to-green-500' 
+                                                                : 'bg-gray-500 text-gray-300'
+                                }`}
                         >
-                                Apply now
+                                {messageSent ? '✅ Candidature envoyée' : isSending ? '📤 Envoi...' : 'Apply now'}
                         </button>
                 </div>
         );

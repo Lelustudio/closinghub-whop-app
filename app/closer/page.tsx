@@ -95,6 +95,12 @@ export default function CloserHome() {
 					>
 						Voir les offres d'emploi
 					</Link>
+					<Link 
+						href="/messages"
+						className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors flex items-center gap-2"
+					>
+						💬 Messages
+					</Link>
 				</div>
 
 				{/* Loading */}
