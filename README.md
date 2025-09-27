@@ -9,6 +9,10 @@ Une application Whop pour connecter les Closers et les Entrepreneurs.
 - ✅ **Icônes personnalisées** 
 - ✅ **Validation des données**
 - ✅ **Interface responsive**
+- ✅ **Messagerie privée** avec Whop
+- ✅ **CTA Hire/Apply** avec envoi automatique
+- ✅ **Gestion des conversations**
+- ✅ **Templates de messages** personnalisés
 
 ## 🛠️ Technologies
 
