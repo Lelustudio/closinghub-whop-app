@@ -13,6 +13,7 @@ Une application Whop pour connecter les Closers et les Entrepreneurs.
 - ✅ **CTA Hire/Apply** avec envoi automatique
 - ✅ **Gestion des conversations**
 - ✅ **Templates de messages** personnalisés
+- ✅ **Déploiement v0.1.1** - Toutes les phases terminées
 
 ## 🛠️ Technologies
 
